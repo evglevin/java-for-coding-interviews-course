@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { HeadContent, Link, Scripts, createRootRoute } from '@tanstack/react-router';
+import { Analytics } from '@vercel/analytics/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { THEME_BOOT_SCRIPT } from '@/features/preferences/preferences';
 import { SITE_HEAD } from '@/features/seo/seo';
@@ -37,6 +38,8 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body>
         <TooltipProvider delayDuration={400}>{children}</TooltipProvider>
+        {/* Vercel Web Analytics: no cookies; only sends on the deployed site, not in dev. */}
+        <Analytics />
         <Scripts />
       </body>
     </html>
