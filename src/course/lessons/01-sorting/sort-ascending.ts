@@ -54,7 +54,7 @@ System.out.println(fruits); // [apple, banana, grape]`,
       items: [
         'Numbers sort from smallest to largest, negatives first.',
         'Strings sort lexicographically by character code, so every uppercase letter comes before every lowercase one: `"Zebra"` sorts before `"apple"`.',
-        '`char`s sort by their code too: `\'A\'` (65) before `\'a\'` (97).',
+        "`char`s sort by their code too: `'A'` (65) before `'a'` (97).",
       ],
     },
     {

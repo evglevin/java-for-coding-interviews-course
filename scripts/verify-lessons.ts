@@ -86,7 +86,8 @@ async function checkLesson(backend: JavaBackend<unknown>, lesson: Lesson): Promi
   }
 
   const starterSubmit = await execute(backend, { mode: 'submit', source: lesson.starterCode, tests });
-  if (starterSubmit.failure?.kind === 'mismatch') problems.push(`Tests don't compile against the starter:\n${describe(starterSubmit)}`);
+  if (starterSubmit.failure?.kind === 'mismatch')
+    problems.push(`Tests don't compile against the starter:\n${describe(starterSubmit)}`);
   else if (starterSubmit.allPassed) problems.push('The starter code already passes every test');
 
   return problems;

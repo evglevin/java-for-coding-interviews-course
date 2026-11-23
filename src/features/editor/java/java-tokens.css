@@ -1,0 +1,64 @@
+/*
+ * Java token colors for the editor and the lesson code blocks. `highlighting.ts` emits the
+ * `java-*` classes; the palette follows the Python course (VS Code Dark+ in dark mode).
+ */
+
+:root {
+  --java-fg: #18181b;
+  --java-keyword: #7c3aed;
+  --java-type: #0284c7;
+  --java-function: #b45309;
+  --java-annotation: #b45309;
+  --java-constant: #1d4ed8;
+  --java-variable: #1e293b;
+  --java-number: #059669;
+  --java-string: #c2410c;
+  --java-comment: #15803d;
+  --java-atom: #2563eb;
+}
+
+.dark {
+  --java-fg: #e4e4e7;
+  --java-keyword: #c586c0;
+  --java-type: #4ec9b0;
+  --java-function: #dcdcaa;
+  --java-annotation: #dcdcaa;
+  --java-constant: #4fc1ff;
+  --java-variable: #9cdcfe;
+  --java-number: #b5cea8;
+  --java-string: #ce9178;
+  --java-comment: #6a9955;
+  --java-atom: #569cd6;
+}
+
+.java-keyword {
+  color: var(--java-keyword);
+}
+.java-type {
+  color: var(--java-type);
+}
+.java-function {
+  color: var(--java-function);
+}
+.java-annotation {
+  color: var(--java-annotation);
+}
+.java-constant {
+  color: var(--java-constant);
+}
+.java-variable {
+  color: var(--java-variable);
+}
+.java-number {
+  color: var(--java-number);
+}
+.java-string {
+  color: var(--java-string);
+}
+.java-comment {
+  color: var(--java-comment);
+  font-style: italic;
+}
+.java-atom {
+  color: var(--java-atom);
+}

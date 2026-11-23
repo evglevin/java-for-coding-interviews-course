@@ -46,7 +46,13 @@ function runInWorker(wasm: Uint8Array, limitMs: number): Promise<ProgramOutput> 
       settled = true;
       clearTimeout(timer);
       void worker.terminate();
-      resolve({ stdout: reader.stdout, stderr, events: reader.events, termination, runMs: Math.round(performance.now() - started) });
+      resolve({
+        stdout: reader.stdout,
+        stderr,
+        events: reader.events,
+        termination,
+        runMs: Math.round(performance.now() - started),
+      });
     };
     const timer = setTimeout(() => finish({ kind: 'timeout', limitMs }), limitMs);
     worker.on('message', (message: { stdout: string; stderr: string } | { termination: Termination }) => {

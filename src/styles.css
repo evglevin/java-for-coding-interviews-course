@@ -1,0 +1,159 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/geist';
+@import './features/editor/java/java-tokens.css';
+
+/* `dark:` follows the in-app theme toggle (the .dark class on <html>), not the OS setting. */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+
+  /* shadcn/ui tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* App tokens */
+  --color-topbar: var(--topbar);
+  --color-elevated: var(--elevated);
+  --color-code: var(--code);
+  --color-border-strong: var(--border-strong);
+  --color-prose: var(--prose);
+  --color-brand: var(--brand);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-inline-code: var(--inline-code);
+  --color-inline-code-foreground: var(--inline-code-foreground);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  --radius: 0.5rem;
+
+  --background: #f3f4f6; /* page canvas */
+  --foreground: #14161a;
+  --card: #ffffff; /* panels */
+  --card-foreground: #14161a;
+  --popover: #ffffff;
+  --popover-foreground: #14161a;
+  --primary: #0766ff;
+  --primary-foreground: #ffffff;
+  --secondary: #eceef2;
+  --secondary-foreground: #14161a;
+  --muted: #f8f9fb;
+  --muted-foreground: #71717a;
+  --accent: #eceef2; /* hover */
+  --accent-foreground: #14161a;
+  --destructive: #ef4444;
+  --border: #e2e5ea;
+  --input: #d0d5dd;
+  --ring: #0766ff;
+
+  --topbar: #ffffff;
+  --elevated: #f8f9fb;
+  --code: #f5f6f8;
+  --border-strong: #d0d5dd;
+  --prose: #4b5563;
+  --brand: #0766ff;
+  --success: #16a34a;
+  --success-soft: rgb(34 197 94 / 0.1);
+  --danger: #dc2626;
+  --danger-soft: rgb(239 68 68 / 0.1);
+  --inline-code: #eef0f4;
+  --inline-code-foreground: #1f2937;
+}
+
+.dark {
+  --background: #161618;
+  --foreground: #f4f4f5;
+  --card: #202024;
+  --card-foreground: #f4f4f5;
+  --popover: #27272c;
+  --popover-foreground: #f4f4f5;
+  --primary: #0766ff;
+  --primary-foreground: #ffffff;
+  --secondary: #2c2c32;
+  --secondary-foreground: #f4f4f5;
+  --muted: #27272c;
+  --muted-foreground: #8b8b96;
+  --accent: #2c2c32;
+  --accent-foreground: #f4f4f5;
+  --destructive: #f87171;
+  --border: #2e2e34;
+  --input: #3c3c44;
+  --ring: #4d8eff;
+
+  --topbar: #1b1b1e;
+  --elevated: #27272c;
+  --code: #18181b;
+  --border-strong: #3c3c44;
+  --prose: #c4c4cc;
+  --brand: #4d8eff;
+  --success: #22c55e;
+  --success-soft: rgb(34 197 94 / 0.11);
+  --danger: #f87171;
+  --danger-soft: rgb(248 113 113 / 0.11);
+  --inline-code: #2c2c34;
+  --inline-code-foreground: #e4e4e7;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html,
+  body {
+    @apply h-full overflow-hidden bg-background font-sans text-foreground antialiased;
+  }
+}
+
+/* Slim scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(139 139 150 / 0.28);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(139 139 150 / 0.45);
+}
+
+/* CodeMirror fills its pane */
+.cm-editor {
+  height: 100%;
+  outline: none !important;
+}
+.cm-scroller {
+  font-family: var(--font-mono) !important;
+  line-height: 1.65 !important;
+}

@@ -13,7 +13,7 @@ export const SECTIONS: Section[] = COURSE.map((section, i) => ({
 }));
 
 export const LESSONS: Lesson[] = COURSE.flatMap((section) =>
-  section.lessons.map((lesson, i) => ({ ...lesson, sectionId: section.id, positionInSection: i + 1 }))
+  section.lessons.map((lesson, i) => ({ ...lesson, sectionId: section.id, positionInSection: i + 1 })),
 ).map((lesson, index) => ({ ...lesson, index }));
 
 const lessonsById = new Map(LESSONS.map((l) => [l.id, l]));

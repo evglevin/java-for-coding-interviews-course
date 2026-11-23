@@ -23,8 +23,17 @@ export function createJdkBackend(): JavaBackend<string> {
       const started = performance.now();
       const result = spawnSync(
         'javac',
-        ['--release', RELEASE, '-encoding', 'UTF-8', '-Xlint:none', '-d', path.join(dir, 'out'), ...program.sources.map((s) => s.path)],
-        { cwd: dir, encoding: 'utf8' }
+        [
+          '--release',
+          RELEASE,
+          '-encoding',
+          'UTF-8',
+          '-Xlint:none',
+          '-d',
+          path.join(dir, 'out'),
+          ...program.sources.map((s) => s.path),
+        ],
+        { cwd: dir, encoding: 'utf8' },
       );
       const compileMs = Math.round(performance.now() - started);
       if (result.status === 0) return { outcome: { ok: true, compileMs }, artifact: dir };
@@ -47,7 +56,13 @@ export function createJdkBackend(): JavaBackend<string> {
         child.on('close', () => {
           clearTimeout(timer);
           fs.rmSync(dir, { recursive: true, force: true });
-          resolve({ stdout: reader.stdout, stderr, events: reader.events, termination, runMs: Math.round(performance.now() - started) });
+          resolve({
+            stdout: reader.stdout,
+            stderr,
+            events: reader.events,
+            termination,
+            runMs: Math.round(performance.now() - started),
+          });
         });
       });
     },

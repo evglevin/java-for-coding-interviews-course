@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /teavm/
+
+Sitemap: https://java.evgenylevin.com/sitemap.xml

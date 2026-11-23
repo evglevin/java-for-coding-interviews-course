@@ -14,7 +14,7 @@ export type TeaVMLoad = (
     stackDeobfuscator?: { enabled: boolean; path?: string };
     installImports?: (imports: TeaVMImports) => void;
     onExit?: (code: number) => void;
-  }
+  },
 ) => Promise<{ exports: Record<string, unknown> }>;
 
 interface TeaVMImports {
@@ -38,11 +38,7 @@ interface NativeCompiler {
   clearSourceFiles(): void;
   clearOutputFiles(): void;
   compile(): boolean;
-  generateWebAssembly(options: {
-    outputName: string;
-    mainClass: string;
-    obfuscated?: boolean;
-  }): Promise<boolean>;
+  generateWebAssembly(options: { outputName: string; mainClass: string; obfuscated?: boolean }): Promise<boolean>;
   getWebAssemblyOutputFile(path: string): Int8Array | null;
 }
 
@@ -142,7 +138,7 @@ export async function startProgram(
     poll: () => boolean;
     /** Called once the module is loaded, right before `main`. */
     onStart?: () => void;
-  }
+  },
 ): Promise<ProgramRun> {
   let settle!: (t: Termination) => void;
   const finished = new Promise<Termination>((resolve) => (settle = resolve));

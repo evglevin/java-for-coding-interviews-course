@@ -5,23 +5,9 @@
  */
 
 import type { TestCase } from '../../course/types.ts';
-import type {
-  CompileDiagnostic,
-  JavaException,
-  RunFailure,
-  RunRequest,
-  RunResult,
-  TestResult,
-} from '../types.ts';
+import type { CompileDiagnostic, JavaException, RunFailure, RunRequest, RunResult, TestResult } from '../types.ts';
 import type { ProgramEvent } from './events.ts';
-import {
-  GRADER_CLASS,
-  HARNESS_FILE,
-  HARNESS_JAVA,
-  LAUNCHER_CLASS,
-  LAUNCHER_JAVA,
-  USER_FILE,
-} from './harness.java.ts';
+import { GRADER_CLASS, HARNESS_FILE, HARNESS_JAVA, LAUNCHER_CLASS, LAUNCHER_JAVA, USER_FILE } from './harness.java.ts';
 
 export interface SourceFile {
   path: string;
@@ -72,7 +58,11 @@ function graderSource(tests: readonly TestCase[]) {
   tests.forEach((test, i) => {
     lines.push('', `    private static void test${i}(__T t) throws Throwable {`);
     const first = lines.length + 1;
-    lines.push(...dedent(test.code).split('\n').map((line) => (line ? `        ${line}` : line)));
+    lines.push(
+      ...dedent(test.code)
+        .split('\n')
+        .map((line) => (line ? `        ${line}` : line)),
+    );
     testLines.push({ first, last: lines.length });
     lines.push('    }');
   });
@@ -94,9 +84,7 @@ export interface RawDiagnostic extends CompileDiagnostic {
   file: string | null;
 }
 
-export type CompileOutcome =
-  | { ok: true; compileMs: number }
-  | { ok: false; compileMs: number; diagnostics: RawDiagnostic[] };
+export type CompileOutcome = { ok: true; compileMs: number } | { ok: false; compileMs: number; diagnostics: RawDiagnostic[] };
 
 /** How the program process ended, from the host's point of view. */
 export type Termination =
@@ -119,7 +107,7 @@ export interface ProgramOutput {
 export function compileFailureResult(
   request: RunRequest,
   program: Program,
-  compile: Extract<CompileOutcome, { ok: false }>
+  compile: Extract<CompileOutcome, { ok: false }>,
 ): RunResult {
   const errors = compile.diagnostics.filter((d) => d.severity === 'error');
   const inUserFile = errors.filter((d) => d.file === null || d.file.endsWith(USER_FILE));
@@ -211,7 +199,16 @@ export function programResult(request: RunRequest, compileMs: number, output: Pr
 
 export function emptyResult(request: RunRequest, failure: RunFailure, compileMs: number, runMs: number): RunResult {
   if (request.mode === 'run') {
-    return { mode: 'run', stdout: '', stderr: '', failure, compileMs, runMs, expectedOutput: request.expectedOutput, outputMatches: false };
+    return {
+      mode: 'run',
+      stdout: '',
+      stderr: '',
+      failure,
+      compileMs,
+      runMs,
+      expectedOutput: request.expectedOutput,
+      outputMatches: false,
+    };
   }
   return {
     mode: 'submit',
@@ -228,7 +225,7 @@ export function emptyResult(request: RunRequest, failure: RunFailure, compileMs:
 function terminationFailure(
   termination: Termination,
   finished: boolean,
-  exception: JavaException | undefined
+  exception: JavaException | undefined,
 ): RunFailure | undefined {
   if (exception) return { kind: 'exception', exception };
   switch (termination.kind) {

@@ -5,8 +5,7 @@ import type { TestCase } from '../course/types.ts';
 export type RunMode = 'run' | 'submit';
 
 export type RunRequest =
-  | { mode: 'run'; source: string; expectedOutput: string }
-  | { mode: 'submit'; source: string; tests: readonly TestCase[] };
+  { mode: 'run'; source: string; expectedOutput: string } | { mode: 'submit'; source: string; tests: readonly TestCase[] };
 
 export interface CompileDiagnostic {
   severity: 'error' | 'warning';

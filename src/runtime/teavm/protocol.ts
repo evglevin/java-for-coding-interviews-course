@@ -14,6 +14,4 @@ export type ProgramRequest = { type: 'run'; wasm: Uint8Array };
 
 export type ProgramResponse =
   /** The module is loaded and `main` is about to be called. */
-  | { type: 'started' }
-  | { type: 'output'; stdout: string; stderr: string }
-  | { type: 'exit'; termination: Termination };
+  { type: 'started' } | { type: 'output'; stdout: string; stderr: string } | { type: 'exit'; termination: Termination };

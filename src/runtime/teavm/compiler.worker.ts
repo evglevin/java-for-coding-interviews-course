@@ -18,17 +18,14 @@ async function fetchBytes(url: string): Promise<ArrayBuffer> {
 
 async function init(): Promise<TeaVMCompiler> {
   const { load } = (await import(/* @vite-ignore */ assetUrl(TEAVM_FILES.runtime))) as { load: TeaVMLoad };
-  const [sdk, classlib] = await Promise.all([
-    fetchBytes(assetUrl(TEAVM_FILES.sdk)),
-    fetchBytes(assetUrl(TEAVM_FILES.classlib)),
-  ]);
+  const [sdk, classlib] = await Promise.all([fetchBytes(assetUrl(TEAVM_FILES.sdk)), fetchBytes(assetUrl(TEAVM_FILES.classlib))]);
   return TeaVMCompiler.create(load, { compilerWasm: assetUrl(TEAVM_FILES.compiler), sdk, classlib });
 }
 
 const compiler = init();
 compiler.then(
   () => post({ type: 'ready' }),
-  (error: unknown) => post({ type: 'initError', message: error instanceof Error ? error.message : String(error) })
+  (error: unknown) => post({ type: 'initError', message: error instanceof Error ? error.message : String(error) }),
 );
 
 self.onmessage = async ({ data }: MessageEvent<CompilerRequest>) => {

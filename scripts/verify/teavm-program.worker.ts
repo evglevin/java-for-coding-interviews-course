@@ -25,10 +25,10 @@ const { load } = (await import(pathToFileURL(teavmFile(TEAVM_FILES.runtime)).hre
 const run = await startProgram(load, workerData.wasm as Uint8Array, {
   deobfuscatorPath: teavmFile(TEAVM_FILES.deobfuscator),
   onStdout: (c) => {
-        stdout += String.fromCharCode(c);
-        // Hand over each harness event at once: a program stuck in a loop never yields to timers.
-        if (c === FRAME_END_CODE) flush();
-      },
+    stdout += String.fromCharCode(c);
+    // Hand over each harness event at once: a program stuck in a loop never yields to timers.
+    if (c === FRAME_END_CODE) flush();
+  },
   onStderr: (c) => (stderr += String.fromCharCode(c)),
   poll: () => {
     flush();
