@@ -6,6 +6,7 @@
  */
 
 import type { CompileOutcome, Program, RawDiagnostic, Termination } from '../grading/program.ts';
+import { WARMUP_PROGRAM } from './warmup.ts';
 
 /** `load` from TeaVM's `compiler.wasm-runtime.js`. */
 export type TeaVMLoad = (
@@ -56,14 +57,35 @@ export interface CompiledProgram {
   wasm: Uint8Array | null;
 }
 
-/** Compiles one program at a time; reusing the instance keeps later compiles fast. */
+/**
+ * Compiles one program at a time; reusing the instance keeps later compiles fast (about
+ * 0.35 s instead of 0.8 s for a fresh one). teavm-javac's state can break between compiles
+ * (see warmup.ts): a crashed instance is replaced and the program compiled again on the new one.
+ */
 export class TeaVMCompiler {
   private queue: Promise<unknown> = Promise.resolve();
   private diagnostics: RawDiagnostic[] = [];
-  private readonly native: NativeCompiler;
+  private native: NativeCompiler | null = null;
+  private readonly load: TeaVMLoad;
+  private readonly files: TeaVMFiles;
 
-  private constructor(native: NativeCompiler) {
-    this.native = native;
+  private constructor(load: TeaVMLoad, files: TeaVMFiles) {
+    this.load = load;
+    this.files = files;
+  }
+
+  static async create(load: TeaVMLoad, files: TeaVMFiles): Promise<TeaVMCompiler> {
+    const compiler = new TeaVMCompiler(load, files);
+    await compiler.compile(WARMUP_PROGRAM);
+    return compiler;
+  }
+
+  /** A compiler in a new WebAssembly instance, so no state carries over from a crashed one. */
+  private async startInstance(): Promise<NativeCompiler> {
+    const teavm = await this.load(this.files.compilerWasm);
+    const native = (teavm.exports.createCompiler as () => NativeCompiler)();
+    native.setSdk(new Int8Array(this.files.sdk));
+    native.setTeaVMClasslib(new Int8Array(this.files.classlib));
     native.onDiagnostic((d) => {
       if (d.severity === 'other') return;
       this.diagnostics.push({
@@ -74,15 +96,7 @@ export class TeaVMCompiler {
         message: d.message,
       });
     });
-  }
-
-  static async create(load: TeaVMLoad, files: TeaVMFiles): Promise<TeaVMCompiler> {
-    const teavm = await load(files.compilerWasm);
-    const createCompiler = teavm.exports.createCompiler as () => NativeCompiler;
-    const native = createCompiler();
-    native.setSdk(new Int8Array(files.sdk));
-    native.setTeaVMClasslib(new Int8Array(files.classlib));
-    return new TeaVMCompiler(native);
+    return native;
   }
 
   compile(program: Program): Promise<CompiledProgram> {
@@ -93,7 +107,17 @@ export class TeaVMCompiler {
 
   private async compileNow(program: Program): Promise<CompiledProgram> {
     const started = performance.now();
-    const { native } = this;
+    this.native ??= await this.startInstance();
+    try {
+      return await this.compileWith(this.native, program, started);
+    } catch {
+      // The instance crashed and stays unusable. The first compile on a fresh one is safe.
+      this.native = await this.startInstance();
+      return this.compileWith(this.native, program, started);
+    }
+  }
+
+  private async compileWith(native: NativeCompiler, program: Program, started: number): Promise<CompiledProgram> {
     this.diagnostics = [];
     native.clearSourceFiles();
     native.clearOutputFiles();
