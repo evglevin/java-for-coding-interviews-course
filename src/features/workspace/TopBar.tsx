@@ -53,20 +53,10 @@ function LessonArrow({ lesson, direction }: { lesson: Lesson | null; direction: 
 
 export const TopBar = memo(function TopBar(props: TopBarProps) {
   const { lesson, section, sidebarOpen, theme, solvedCount, totalLessons } = props;
-  const SidebarIcon = sidebarOpen ? PanelLeftClose : PanelLeft;
   return (
     <header className="flex h-11 shrink-0 items-center justify-between gap-2 border-b bg-topbar px-2 select-none md:px-3">
       <div className="flex min-w-0 items-center gap-1.5">
-        <Hint label={sidebarOpen ? 'Hide lessons' : 'Show lessons'}>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={props.onToggleSidebar}
-            aria-label={sidebarOpen ? 'Hide lessons' : 'Show lessons'}
-          >
-            <SidebarIcon />
-          </Button>
-        </Hint>
+        <SidebarToggle open={sidebarOpen} solved={solvedCount} total={totalLessons} onClick={props.onToggleSidebar} />
         <span className="hidden truncate px-1 text-sm font-medium sm:inline">{SITE_NAME}</span>
         {!sidebarOpen && (
           <>
@@ -98,42 +88,64 @@ export const TopBar = memo(function TopBar(props: TopBarProps) {
             </a>
           </Button>
         </Hint>
-        <ProgressRing solved={solvedCount} total={totalLessons} onClick={props.onToggleSidebar} />
       </div>
     </header>
   );
 });
 
-function ProgressRing({ solved, total, onClick }: { solved: number; total: number; onClick: () => void }) {
-  const radius = 11;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference * (1 - (total ? solved / total : 0));
+/**
+ * Opens and closes the lessons sidebar. While the sidebar (and its progress bar) is hidden,
+ * the button also shows the course progress.
+ */
+function SidebarToggle({ open, solved, total, onClick }: { open: boolean; solved: number; total: number; onClick: () => void }) {
+  if (open) {
+    return (
+      <Hint label="Hide lessons">
+        <Button variant="ghost" size="icon-sm" onClick={onClick} aria-label="Hide lessons">
+          <PanelLeftClose />
+        </Button>
+      </Hint>
+    );
+  }
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={`${solved} of ${total} lessons solved`}
-      className="flex items-center gap-2 rounded-full border bg-elevated px-1.5 py-1 text-xs font-medium transition-colors hover:bg-accent sm:px-2.5"
-    >
-      <svg className="size-6 -rotate-90" viewBox="0 0 28 28" aria-hidden="true">
-        <circle cx="14" cy="14" r={radius} fill="none" stroke="currentColor" strokeWidth="2.5" className="text-border-strong" />
-        <circle
-          cx="14"
-          cy="14"
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          className="text-success transition-all duration-300"
-        />
-      </svg>
-      <span className="font-mono">
-        {solved}/{total}
-      </span>
-    </button>
+    <Hint label={`Show lessons (${solved} of ${total} solved)`}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onClick}
+        aria-label={`Show lessons, ${solved} of ${total} solved`}
+        className="h-7 shrink-0 gap-1.5 bg-elevated pr-2 pl-1.5 text-muted-foreground hover:text-foreground"
+      >
+        <PanelLeft className="size-4" />
+        <span className="h-3.5 w-px shrink-0 bg-border-strong" aria-hidden="true" />
+        <ProgressRing fraction={total ? solved / total : 0} />
+        <span className="font-mono text-xs leading-none text-foreground tabular-nums">
+          {solved}/{total}
+        </span>
+      </Button>
+    </Hint>
+  );
+}
+
+function ProgressRing({ fraction }: { fraction: number }) {
+  const radius = 7.5;
+  const circumference = 2 * Math.PI * radius;
+  return (
+    <svg className="size-4 shrink-0 -rotate-90" viewBox="0 0 20 20" aria-hidden="true">
+      <circle cx="10" cy="10" r={radius} fill="none" stroke="currentColor" strokeWidth="2.2" className="text-border-strong" />
+      <circle
+        cx="10"
+        cy="10"
+        r={radius}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={circumference * (1 - fraction)}
+        className="text-success transition-all duration-300"
+      />
+    </svg>
   );
 }
 
