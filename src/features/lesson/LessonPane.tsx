@@ -15,7 +15,7 @@ interface LessonPaneProps {
 export const LessonPane = memo(function LessonPane({ lesson, isSolved, onLoadSolution }: LessonPaneProps) {
   return (
     <Tabs defaultValue="question" className="flex h-full min-h-0 flex-col gap-0 overflow-hidden rounded-lg border bg-card">
-      <div className="shrink-0 overflow-x-auto border-b px-1 md:px-2">
+      <div className="shrink-0 overflow-x-auto overflow-y-hidden border-b px-1 md:px-2">
         <TabsList variant="line" className="h-10">
           <TabsTrigger value="question" className="px-3 text-xs">
             <FileText /> Question

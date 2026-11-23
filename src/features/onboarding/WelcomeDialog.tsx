@@ -20,13 +20,15 @@ interface WelcomeDialogProps {
   onClose(): void;
 }
 
+const count = (n: number, noun: string) => `${n} ${noun}${n === 1 ? '' : 's'}`;
+
 /** One-time introduction on the first visit. */
 export function WelcomeDialog({ open, totalLessons, totalSections, onClose }: WelcomeDialogProps) {
   const points = [
     {
       icon: BookOpen,
       title: 'Read the lesson',
-      body: `${totalLessons} short lessons in ${totalSections} sections cover the Java you need in interviews: sorting, collections, hash maps, heaps, and more.`,
+      body: `${count(totalLessons, 'short lesson')} in ${count(totalSections, 'section')} cover the Java you need in interviews: sorting, collections, hash maps, heaps, and more.`,
     },
     {
       icon: Code2,

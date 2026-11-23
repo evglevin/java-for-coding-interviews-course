@@ -3,9 +3,12 @@
 
 import type { CompilerRequest, CompilerResponse } from './protocol.ts';
 import { TEAVM_FILES, teavmAssetPath } from './assets.ts';
+import { removeProcessStub } from './browserGlobals.ts';
 import { TeaVMCompiler, type TeaVMLoad } from './teavm.ts';
 
 declare const self: DedicatedWorkerGlobalScope;
+
+removeProcessStub();
 
 const post = (message: CompilerResponse, transfer: Transferable[] = []) => self.postMessage(message, transfer);
 const assetUrl = (file: string) => new URL(teavmAssetPath(file), self.location.origin).href;

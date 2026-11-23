@@ -8,9 +8,12 @@ import { EventReader, FRAME_END_CODE } from '../grading/events.ts';
 import type { Termination } from '../grading/program.ts';
 import type { ProgramRequest, ProgramResponse } from './protocol.ts';
 import { TEAVM_FILES, teavmAssetPath } from './assets.ts';
+import { removeProcessStub } from './browserGlobals.ts';
 import { classifyError, startProgram, type TeaVMLoad } from './teavm.ts';
 
 declare const self: DedicatedWorkerGlobalScope;
+
+removeProcessStub();
 
 const post = (message: ProgramResponse) => self.postMessage(message);
 const assetUrl = (file: string) => new URL(teavmAssetPath(file), self.location.origin).href;
