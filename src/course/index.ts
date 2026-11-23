@@ -2,8 +2,24 @@
 
 import type { Lesson, Section, SectionData } from './types.ts';
 import { sorting } from './lessons/01-sorting/index.ts';
+import { javaEssentials } from './lessons/02-java-essentials/index.ts';
+import { arraysAndLists } from './lessons/03-arrays-lists/index.ts';
+import { stacksAndQueues } from './lessons/04-stacks-queues/index.ts';
+import { twoDArrays } from './lessons/05-2d-arrays/index.ts';
+import { hashMapsAndSets } from './lessons/06-hashmap-hashset/index.ts';
+import { priorityQueues } from './lessons/07-priority-queue/index.ts';
+import { treeMapsAndSets } from './lessons/08-treemap-treeset/index.ts';
 
-const COURSE: SectionData[] = [sorting];
+const COURSE: SectionData[] = [
+  sorting,
+  javaEssentials,
+  arraysAndLists,
+  stacksAndQueues,
+  twoDArrays,
+  hashMapsAndSets,
+  priorityQueues,
+  treeMapsAndSets,
+];
 
 export const SECTIONS: Section[] = COURSE.map((section, i) => ({
   id: section.id,
