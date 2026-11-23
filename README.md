@@ -66,3 +66,6 @@ pinned TeaVM changed), run `npm run teavm:build`, update `TEAVM_ASSET_VERSION` i
 [MIT](LICENSE) © 2026 Evgenii Levin. The compiler files in `public/teavm/` are from
 [teavm-javac](https://github.com/konsoletyper/teavm-javac) (Apache 2.0) and include OpenJDK
 components (GPLv2 with the Classpath Exception).
+
+Java and the Java coffee cup logo are trademarks of Oracle and/or its affiliates. This course is
+not affiliated with or endorsed by Oracle.
