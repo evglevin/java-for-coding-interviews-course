@@ -110,7 +110,11 @@ function Block({ block }: { block: ContentBlock }) {
         </p>
       );
     case 'heading':
-      return <h3 className="pt-2 text-base font-bold text-foreground">{block.text}</h3>;
+      return (
+        <h3 className="pt-2 text-base font-bold text-foreground">
+          <Markup text={block.text} />
+        </h3>
+      );
     case 'code':
       return <JavaCodeBlock code={block.code} caption={block.caption} />;
     case 'list':
@@ -128,7 +132,11 @@ function Block({ block }: { block: ContentBlock }) {
         <aside className="flex gap-2.5 rounded-lg border bg-elevated px-3.5 py-3 text-sm">
           <Info className="mt-0.5 size-4 shrink-0 text-brand" />
           <div className="space-y-0.5">
-            {block.title && <div className="font-semibold text-foreground">{block.title}</div>}
+            {block.title && (
+              <div className="font-semibold text-foreground">
+                <Markup text={block.title} />
+              </div>
+            )}
             <div>
               <Markup text={block.text} />
             </div>

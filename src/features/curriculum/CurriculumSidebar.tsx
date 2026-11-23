@@ -112,9 +112,7 @@ export const CurriculumSidebar = memo(function CurriculumSidebar({
                       >
                         {section.number}
                       </span>
-                      <span className="truncate text-[11px] font-bold tracking-wider text-foreground uppercase">
-                        {section.title}
-                      </span>
+                      <span className="truncate text-[13px] font-semibold text-foreground">{section.title}</span>
                     </span>
                     <span className="flex shrink-0 items-center gap-1.5">
                       <span
