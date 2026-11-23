@@ -33,16 +33,26 @@ function loadSolved(): ReadonlySet<string> {
 
 const solved = createSignal<ReadonlySet<string>>(isBrowser ? loadSolved() : EMPTY);
 
+export function getSolvedIds(): ReadonlySet<string> {
+  return solved.get();
+}
+
 export function useSolvedIds(): ReadonlySet<string> {
   return useSyncExternalStore(solved.subscribe, solved.get, () => EMPTY);
 }
 
-export function markSolved(lessonId: string): void {
+/** Marks a lesson solved. Returns true if it wasn't already solved. */
+export function markSolved(lessonId: string): boolean {
   const current = solved.get();
-  if (current.has(lessonId)) return;
+  if (current.has(lessonId)) return false;
   const next = new Set(current).add(lessonId);
   writeItem(STORAGE_KEYS.solved, JSON.stringify([...next]));
   solved.set(next);
+  return true;
+}
+
+export function areAllLessonsSolved(solvedIds: ReadonlySet<string>, lessonIds: readonly string[]): boolean {
+  return lessonIds.length > 0 && lessonIds.every((id) => solvedIds.has(id));
 }
 
 // ---- Editor tabs ------------------------------------------------------------------------

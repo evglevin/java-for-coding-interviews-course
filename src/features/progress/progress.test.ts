@@ -71,4 +71,18 @@ describe('progress', () => {
     progress.clearProgress();
     expect(progress.loadProgress()).toEqual({ solved: [], tabs: {} });
   });
+
+  it('reports whether a lesson was newly solved', () => {
+    expect(progress.markSolved('a')).toBe(true);
+    expect(progress.markSolved('a')).toBe(false);
+    expect(progress.getSolvedIds().has('a')).toBe(true);
+  });
+
+  it('detects when all course lessons are solved, ignoring unknown ids', () => {
+    const courseLessons = ['a', 'b', 'c'];
+    expect(progress.areAllLessonsSolved(new Set(), [])).toBe(false);
+    expect(progress.areAllLessonsSolved(new Set(['a', 'b', 'stale-lesson']), courseLessons)).toBe(false);
+    expect(progress.areAllLessonsSolved(new Set(['a', 'b', 'c']), courseLessons)).toBe(true);
+    expect(progress.areAllLessonsSolved(new Set(['a', 'b', 'c', 'stale-lesson']), courseLessons)).toBe(true);
+  });
 });

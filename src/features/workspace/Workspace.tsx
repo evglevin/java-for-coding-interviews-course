@@ -6,6 +6,7 @@ import { LESSONS, SECTIONS, getSection } from '@/course';
 import type { Lesson } from '@/course/types';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { Confetti } from '@/components/Confetti';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import type { CompileDiagnostic, RunMode, RunResult } from '@/runtime/types';
 import { CurriculumSidebar } from '@/features/curriculum/CurriculumSidebar';
@@ -22,7 +23,9 @@ import {
 } from '@/features/preferences/preferences';
 import { ImportProgressDialog } from '@/features/progress/ImportProgressDialog';
 import {
+  areAllLessonsSolved,
   clearProgress,
+  getSolvedIds,
   loadProgress,
   markSolved,
   replaceProgress,
@@ -35,6 +38,8 @@ import { TopBar } from './TopBar';
 
 // CodeMirror is the heaviest part of the page; it loads after the lesson text is interactive.
 const CodePane = lazy(() => import('./CodePane'));
+
+const LESSON_IDS = LESSONS.map((l) => l.id);
 
 type MobileView = 'lesson' | 'code';
 type Diagnostics = { documentKey: string; items: CompileDiagnostic[] } | null;
@@ -61,6 +66,7 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
   const [editorExpanded, setEditorExpanded] = useState(false);
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [incoming, setIncoming] = useState<IncomingProgress | null>(null);
+  const [confettiRun, setConfettiRun] = useState(0);
 
   // A new lesson starts with a clean console.
   const [shownLessonId, setShownLessonId] = useState(lesson.id);
@@ -111,7 +117,13 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
         mode === 'run'
           ? await javaRuntime.execute({ mode, source: activeTab.code, expectedOutput: runLesson.expectedOutput })
           : await javaRuntime.execute({ mode, source: activeTab.code, tests: runLesson.testCases });
-      if (response.mode === 'submit' && response.allPassed) markSolved(runLesson.id);
+      if (response.mode === 'submit' && response.allPassed) {
+        const wasComplete = areAllLessonsSolved(getSolvedIds(), LESSON_IDS);
+        markSolved(runLesson.id);
+        if (!wasComplete && areAllLessonsSolved(getSolvedIds(), LESSON_IDS)) {
+          setConfettiRun((n) => n + 1);
+        }
+      }
       // The learner may have moved to another lesson while the code ran.
       if (currentLessonId.current !== runLesson.id) return;
       setResult(response);
@@ -286,6 +298,7 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
         </main>
       )}
 
+      <Confetti trigger={confettiRun} />
       <ImportProgressDialog incoming={incoming} currentSolvedCount={solvedIds.size} onClose={closeImport} />
       <ClientOnly>
         <WelcomeDialog
