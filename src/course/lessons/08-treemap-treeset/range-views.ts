@@ -23,7 +23,7 @@ export const rangeViews: LessonData = {
   id: 'range-views',
   title: 'Range Views',
   summary:
-    'Work with key ranges through headMap, tailMap, and subMap (and their TreeSet versions), learn their bounds and live-view behavior, and build an interval booking calendar.',
+    'Work with key ranges through headMap, tailMap, and subMap (and their TreeSet versions), learn their bounds and live views, and build a booking calendar.',
   blocks: [
     {
       type: 'paragraph',
