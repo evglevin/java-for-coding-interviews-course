@@ -5,6 +5,7 @@
  */
 
 import { useSyncExternalStore } from 'react';
+import { FIRST_LESSON, LESSONS } from '@/course';
 import { createSignal, readItem, readJson, removeItem, STORAGE_KEYS, writeItem } from '@/lib/storage';
 
 export interface SolutionTab {
@@ -162,3 +163,15 @@ export function loadActiveLessonId(): string | null {
 export function saveActiveLessonId(lessonId: string): void {
   writeItem(STORAGE_KEYS.activeLesson, lessonId);
 }
+
+/**
+ * Inline <head> script for a full page load of `/`. The home page is prerendered as the first
+ * lesson, so resuming another one after hydration would flash the first lesson. Instead, before
+ * anything paints, this hides the page and replaces it with the saved lesson's own prerendered
+ * page. A `#progress=` link on `/` is left for the app to handle.
+ */
+export const RESUME_LESSON_BOOT_SCRIPT = `(function(){try{var l=location;if(l.pathname!=='/'||l.hash)return;var id=localStorage.getItem(${JSON.stringify(
+  STORAGE_KEYS.activeLesson,
+)});if(!id||id===${JSON.stringify(FIRST_LESSON.id)}||${JSON.stringify(
+  LESSONS.map((lesson) => lesson.id),
+)}.indexOf(id)<0)return;document.documentElement.style.visibility='hidden';l.replace('/lessons/'+encodeURIComponent(id)+l.search);}catch(e){}})();`;

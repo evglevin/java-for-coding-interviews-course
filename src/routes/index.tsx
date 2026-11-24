@@ -12,7 +12,8 @@ export const Route = createFileRoute('/')({
 
 /**
  * The home page is prerendered as the first lesson (with the course's own metadata);
- * returning learners can resume a different lesson they last had open.
+ * returning learners resume the lesson they last had open. On a full page load
+ * RESUME_LESSON_BOOT_SCRIPT redirects before paint; this effect covers in-app navigation to `/`.
  */
 function Home() {
   const navigate = useNavigate();

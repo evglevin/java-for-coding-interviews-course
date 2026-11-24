@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { THEME_BOOT_SCRIPT } from '@/features/preferences/preferences';
+import { RESUME_LESSON_BOOT_SCRIPT } from '@/features/progress/progress';
 import { SITE_HEAD } from '@/features/seo/seo';
 import { FIRST_LESSON } from '@/course';
 import { SITE_URL } from '@/site';
@@ -38,6 +39,7 @@ function RootDocument({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: RESUME_LESSON_BOOT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: IOS_VIEWPORT_SCRIPT }} />
         <HeadContent />
