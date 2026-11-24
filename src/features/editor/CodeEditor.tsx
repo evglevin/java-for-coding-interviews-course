@@ -21,7 +21,7 @@ import type { Theme } from '@/features/preferences/preferences';
 import type { CompileDiagnostic } from '@/runtime/types';
 import { javaLanguage } from './java';
 import { editorTheme } from './editorTheme';
-import { searchPanel } from './searchPanel';
+import { appSearch } from './searchPanel';
 
 export interface CodeEditorHandle {
   /** Replaces the text as an edit the learner can undo (Reset, Load solution). */
@@ -86,7 +86,7 @@ export function CodeEditor({
         crosshairCursor(),
         highlightActiveLine(),
         highlightSelectionMatches(),
-        searchPanel(),
+        appSearch,
         javaLanguage(),
         EditorView.contentAttributes.of({ 'aria-label': 'Java code editor' }),
         keymap.of([

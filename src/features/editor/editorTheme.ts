@@ -61,148 +61,6 @@ function completionIconStyles(isDark: boolean) {
   return styles;
 }
 
-/** The find/replace panel from `searchPanel.ts`, drawn with the app's tokens (border, input, ring, radius). */
-function searchPanelStyles(isDark: boolean) {
-  return {
-    '.cm-panels': {
-      backgroundColor: isDark ? '#1e1e22' : '#fafafa',
-      color: 'var(--foreground)',
-    },
-    '.cm-panels.cm-panels-top': {
-      borderBottom: isDark ? '1px solid #2a2a30' : '1px solid #e5e7eb',
-    },
-    // Both rows share one grid, so the Find and Replace fields always line up at the same width.
-    '.cm-panel.cm-search': {
-      display: 'grid',
-      gridTemplateColumns: 'auto minmax(0, 300px) minmax(max-content, 1fr)',
-      columnGap: '8px',
-      rowGap: '6px',
-      padding: '8px 10px',
-      fontFamily: 'var(--font-sans)',
-      fontSize: '13px',
-    },
-    '.cm-search-row': {
-      display: 'contents',
-    },
-    '.cm-search-row[hidden]': {
-      display: 'none',
-    },
-    '.cm-search-expand': {
-      gridColumn: '1',
-      gridRow: '1',
-    },
-    '.cm-search-expand svg': {
-      transition: 'transform 150ms',
-    },
-    '.cm-search-expand[aria-expanded=true] svg': {
-      transform: 'rotate(90deg)',
-    },
-    '.cm-search-field': {
-      gridColumn: '2',
-      position: 'relative',
-      display: 'flex',
-      alignItems: 'center',
-      minWidth: '0',
-    },
-    '.cm-search-actions': {
-      gridColumn: '3',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '2px',
-    },
-    '.cm-search-input': {
-      width: '100%',
-      height: '28px',
-      padding: '0 8px',
-      border: '1px solid var(--input)',
-      borderRadius: 'var(--radius-md)',
-      backgroundColor: isDark ? 'rgb(60 60 68 / 0.3)' : 'var(--background)',
-      color: 'var(--foreground)',
-      font: 'inherit',
-      outline: 'none',
-      transition: 'border-color 120ms, box-shadow 120ms',
-    },
-    '.cm-search-input[name=search]': {
-      paddingRight: '82px',
-    },
-    '.cm-search-input::placeholder': {
-      color: 'var(--muted-foreground)',
-    },
-    '.cm-search-input:focus': {
-      borderColor: 'var(--ring)',
-      boxShadow: '0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent)',
-    },
-    '.cm-search-input[aria-invalid]': {
-      borderColor: 'var(--destructive)',
-      boxShadow: '0 0 0 3px color-mix(in oklab, var(--destructive) 20%, transparent)',
-    },
-    '.cm-search-toggles': {
-      position: 'absolute',
-      right: '3px',
-      display: 'flex',
-      gap: '1px',
-    },
-    '.cm-search-toggle, .cm-search-button': {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexShrink: '0',
-      padding: '0',
-      border: '1px solid transparent',
-      backgroundColor: 'transparent',
-      color: 'var(--muted-foreground)',
-      cursor: 'pointer',
-      transition: 'background-color 120ms, color 120ms',
-    },
-    '.cm-search-toggle': {
-      width: '24px',
-      height: '22px',
-      borderRadius: 'calc(var(--radius) * 0.6)',
-    },
-    '.cm-search-button': {
-      width: '28px',
-      height: '28px',
-      borderRadius: 'var(--radius-md)',
-    },
-    '.cm-search-toggle svg': { width: '15px', height: '15px' },
-    '.cm-search-button svg': { width: '15px', height: '15px' },
-    '.cm-search-toggle:hover, .cm-search-button:hover': {
-      backgroundColor: 'var(--accent)',
-      color: 'var(--foreground)',
-    },
-    '.cm-search-toggle[aria-pressed=true]': {
-      backgroundColor: isDark ? 'rgba(77, 142, 255, 0.22)' : 'rgba(7, 102, 255, 0.12)',
-      borderColor: isDark ? 'rgba(77, 142, 255, 0.5)' : 'rgba(7, 102, 255, 0.35)',
-      color: 'var(--brand)',
-    },
-    '.cm-search-toggle:focus-visible, .cm-search-button:focus-visible': {
-      outline: 'none',
-      borderColor: 'var(--ring)',
-      boxShadow: '0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent)',
-    },
-    '.cm-search-count': {
-      marginLeft: '6px',
-      color: 'var(--muted-foreground)',
-      fontSize: '12px',
-      fontVariantNumeric: 'tabular-nums',
-      whiteSpace: 'nowrap',
-    },
-    '.cm-search-count[data-empty]': {
-      color: 'var(--danger)',
-    },
-    '.cm-search-close': {
-      marginLeft: 'auto',
-    },
-    '.cm-searchMatch': {
-      backgroundColor: isDark ? 'rgba(250, 204, 21, 0.18)' : 'rgba(250, 204, 21, 0.35)',
-      outline: isDark ? '1px solid rgba(250, 204, 21, 0.4)' : '1px solid rgba(202, 138, 4, 0.45)',
-    },
-    '.cm-searchMatch.cm-searchMatch-selected': {
-      backgroundColor: isDark ? 'rgba(249, 115, 22, 0.42)' : 'rgba(249, 115, 22, 0.4)',
-    },
-  };
-}
-
 export function editorTheme(theme: Theme, fontSize: number): Extension {
   const isDark = theme === 'dark';
   const completionRowHeight = Math.round(fontSize * 1.7);
@@ -247,6 +105,14 @@ export function editorTheme(theme: Theme, fontSize: number): Extension {
       '.cm-matchingBracket': {
         backgroundColor: isDark ? 'rgba(77, 142, 255, 0.25)' : 'rgba(7, 102, 255, 0.18)',
         outline: isDark ? '1px solid rgba(77, 142, 255, 0.6)' : '1px solid rgba(7, 102, 255, 0.5)',
+      },
+      '.cm-searchMatch': {
+        backgroundColor: isDark ? 'rgba(234, 179, 8, 0.22)' : 'rgba(234, 179, 8, 0.28)',
+        borderRadius: '2px',
+      },
+      '.cm-searchMatch.cm-searchMatch-selected': {
+        backgroundColor: isDark ? 'rgba(249, 115, 22, 0.45)' : 'rgba(249, 115, 22, 0.35)',
+        outline: isDark ? '1px solid rgba(251, 146, 60, 0.8)' : '1px solid rgba(234, 88, 12, 0.6)',
       },
       '.cm-tooltip': {
         backgroundColor: isDark ? '#25252b' : '#ffffff',
@@ -324,7 +190,6 @@ export function editorTheme(theme: Theme, fontSize: number): Extension {
         content: 'none',
       },
       ...completionIconStyles(isDark),
-      ...searchPanelStyles(isDark),
       '.cm-tooltip-lint': {
         fontSize: '12px',
       },

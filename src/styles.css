@@ -186,3 +186,149 @@
   font-family: var(--font-mono) !important;
   line-height: 1.65 !important;
 }
+
+/* Editor find/replace panel (searchPanel.ts) */
+.cm-editor .cm-panels.cm-panels-top {
+  background-color: var(--card);
+  color: var(--foreground);
+  border-bottom: 1px solid var(--border);
+}
+
+.editor-search {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 6px 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+
+.editor-search-rows {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.editor-search-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.editor-search-row[hidden] {
+  display: none;
+}
+
+.editor-search-field {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  max-width: 340px;
+  height: 28px;
+  align-items: center;
+  gap: 1px;
+  margin-right: 4px;
+  padding: 0 3px 0 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background-color: var(--elevated);
+  transition:
+    border-color 120ms,
+    box-shadow 120ms;
+}
+
+.editor-search-field:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.editor-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 8px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.editor-search-input::placeholder {
+  color: var(--muted-foreground);
+  font-family: var(--font-sans);
+}
+
+.editor-search-btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    color 120ms;
+}
+
+.editor-search-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.editor-search-btn:hover {
+  background-color: var(--accent);
+  color: var(--foreground);
+}
+
+.editor-search-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+}
+
+.editor-search-toggle {
+  width: 22px;
+  height: 22px;
+}
+
+.editor-search-toggle[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  background-color: color-mix(in srgb, var(--primary) 18%, transparent);
+  color: var(--brand);
+}
+
+.editor-search-expand {
+  height: 28px;
+}
+
+.editor-search-expand svg {
+  transition: transform 150ms;
+}
+
+.editor-search-expand[aria-expanded='true'] svg {
+  transform: rotate(90deg);
+}
+
+.editor-search-close {
+  margin-left: auto;
+}
+
+.editor-search-count {
+  padding: 0 8px;
+  color: var(--prose);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.editor-search-count-empty {
+  color: var(--danger);
+}
