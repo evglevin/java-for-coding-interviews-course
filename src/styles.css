@@ -66,7 +66,7 @@
   --secondary: #eceef2;
   --secondary-foreground: #14161a;
   --muted: #f8f9fb;
-  --muted-foreground: #71717a;
+  --muted-foreground: #68686f;
   --accent: #eceef2; /* hover */
   --accent-foreground: #14161a;
   --destructive: #ef4444;
@@ -80,9 +80,9 @@
   --border-strong: #d0d5dd;
   --prose: #4b5563;
   --brand: #0766ff;
-  --success: #16a34a;
+  --success: #15763a;
   --success-soft: rgb(34 197 94 / 0.1);
-  --danger: #dc2626;
+  --danger: #b91c1c;
   --danger-soft: rgb(239 68 68 / 0.1);
   --inline-code: #eef0f4;
   --inline-code-foreground: #1f2937;

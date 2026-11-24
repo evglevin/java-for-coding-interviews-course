@@ -118,7 +118,7 @@ function SidebarToggle({ open, solved, total, onClick }: { open: boolean; solved
         variant="outline"
         size="sm"
         onClick={onClick}
-        aria-label={`Show lessons, ${solved} of ${total} solved`}
+        aria-label={`Show lessons, ${solved}/${total} solved`}
         className="h-7 shrink-0 gap-1.5 bg-elevated pr-2 pl-1.5 text-muted-foreground hover:text-foreground"
       >
         <PanelLeft className="size-4" />

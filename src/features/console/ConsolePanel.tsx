@@ -78,29 +78,22 @@ export const ConsoleBody = memo(function ConsoleBody({
         )}
       </div>
 
+      {/* Both panels always exist so each tab's aria-controls points at a real element. */}
       <div className="min-h-0 flex-1 overflow-y-auto p-3.5 text-sm">
-        {running && !result ? (
-          <div className="flex h-full items-center justify-center gap-2 text-xs text-muted-foreground">
-            <Loader2 className="size-4 animate-spin text-brand" /> Compiling and running…
-          </div>
-        ) : !result ? (
-          <EmptyState />
-        ) : (
-          <>
-            <TabsContent value="output">
-              <OutputView result={result} onSubmit={onSubmit} />
-            </TabsContent>
-            <TabsContent value="tests">
-              {result.mode === 'submit' ? (
-                <TestsView result={result} hasNextLesson={hasNextLesson} onNextLesson={onNextLesson} />
-              ) : (
-                <p className="py-6 text-center text-xs text-muted-foreground">
-                  <strong className="text-prose">Submit</strong> runs your code against every test case.
-                </p>
-              )}
-            </TabsContent>
-          </>
-        )}
+        <TabsContent value="output" className="h-full">
+          {result ? <OutputView result={result} onSubmit={onSubmit} /> : <Placeholder running={running} />}
+        </TabsContent>
+        <TabsContent value="tests" className="h-full">
+          {!result ? (
+            <Placeholder running={running} />
+          ) : result.mode === 'submit' ? (
+            <TestsView result={result} hasNextLesson={hasNextLesson} onNextLesson={onNextLesson} />
+          ) : (
+            <p className="py-6 text-center text-xs text-muted-foreground">
+              <strong className="text-prose">Submit</strong> runs your code against every test case.
+            </p>
+          )}
+        </TabsContent>
       </div>
     </Tabs>
   );
@@ -110,6 +103,16 @@ export const ConsoleBody = memo(function ConsoleBody({
 function isEarlyFailure(result: RunResult): boolean {
   const kind = result.failure?.kind;
   return kind === 'compile' || kind === 'mismatch' || kind === 'internal';
+}
+
+/** Shown in either tab before the first result arrives. */
+function Placeholder({ running }: { running: boolean }) {
+  if (!running) return <EmptyState />;
+  return (
+    <div className="flex h-full items-center justify-center gap-2 text-xs text-muted-foreground">
+      <Loader2 className="size-4 animate-spin text-brand" /> Compiling and running…
+    </div>
+  );
 }
 
 function EmptyState() {

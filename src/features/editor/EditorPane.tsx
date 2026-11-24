@@ -105,7 +105,7 @@ export function EditorPane(props: EditorPaneProps) {
       </div>
 
       <div className="flex shrink-0 items-center justify-between gap-2 border-b bg-card px-2 py-1">
-        <div className="flex min-w-0 items-center gap-1 overflow-x-auto" role="tablist" aria-label="Solutions">
+        <div className="flex min-w-0 items-center gap-1 overflow-x-auto" role="group" aria-label="Solutions">
           {tabs.map((tab) => {
             const active = tab.id === activeTab.id;
             return (
@@ -118,8 +118,7 @@ export function EditorPane(props: EditorPaneProps) {
               >
                 <button
                   type="button"
-                  role="tab"
-                  aria-selected={active}
+                  aria-current={active ? 'true' : undefined}
                   onClick={() => props.onSelectTab(tab.id)}
                   className={cn('py-1 pl-2.5', tabs.length > 1 ? 'pr-1' : 'pr-2.5')}
                 >

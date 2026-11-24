@@ -86,6 +86,7 @@ export function CodeEditor({
         highlightActiveLine(),
         highlightSelectionMatches(),
         javaLanguage(),
+        EditorView.contentAttributes.of({ 'aria-label': 'Java code editor' }),
         keymap.of([
           { key: 'Mod-Enter', run: () => (callbacks.current.onRun(), true) },
           { key: 'Mod-Shift-Enter', run: () => (callbacks.current.onSubmit(), true) },
