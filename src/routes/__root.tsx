@@ -1,9 +1,8 @@
 import type { ReactNode } from 'react';
 import { HeadContent, Link, Scripts, createRootRoute } from '@tanstack/react-router';
 import { Analytics } from '@vercel/analytics/react';
-import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { THEME_BOOT_SCRIPT } from '@/features/preferences/preferences';
+import { PREFERENCES_BOOT_SCRIPT } from '@/features/preferences/preferences';
 import { RESUME_LESSON_BOOT_SCRIPT } from '@/features/progress/progress';
 import { SITE_HEAD } from '@/features/seo/seo';
 import { FIRST_LESSON } from '@/course';
@@ -25,11 +24,7 @@ export const Route = createRootRoute({
       { name: 'theme-color', content: '#f3f4f6', media: '(prefers-color-scheme: light)' },
       ...SITE_HEAD.meta,
     ],
-    links: [
-      { rel: 'preload', href: geistLatin, as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-      { rel: 'stylesheet', href: appCss },
-      ...SITE_HEAD.links,
-    ],
+    links: [{ rel: 'stylesheet', href: appCss }, ...SITE_HEAD.links],
   }),
   shellComponent: RootDocument,
   notFoundComponent: NotFound,
@@ -40,7 +35,7 @@ function RootDocument({ children }: { children: ReactNode }) {
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: RESUME_LESSON_BOOT_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: PREFERENCES_BOOT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: IOS_VIEWPORT_SCRIPT }} />
         <HeadContent />
       </head>

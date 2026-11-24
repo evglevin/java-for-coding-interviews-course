@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/geist';
 @import './features/editor/java/java-tokens.css';
 
 /* `dark:` follows the in-app theme toggle (the .dark class on <html>), not the OS setting. */
@@ -9,7 +8,7 @@
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 
   /* shadcn/ui tokens */
@@ -124,14 +123,25 @@
 
 /* Use the same lesson markup at every viewport size, including before hydration. */
 @media (width < 48rem) {
-  [data-mobile-pane] > :is(#sidebar, [data-slot='resizable-handle']),
-  [data-mobile-pane='lesson'] > #code,
-  [data-mobile-pane='code'] > #lesson {
-    display: none !important;
+  [data-mobile-pane] :is([data-sidebar-pane], [data-pane-gutter]),
+  [data-mobile-pane='lesson'] #code,
+  [data-mobile-pane='code'] #lesson {
+    display: none;
   }
 
-  [data-mobile-pane] > :is(#lesson, #code) {
-    flex: 1 1 0 !important;
+  [data-mobile-pane] #lesson {
+    width: 100% !important;
+  }
+}
+
+/* Before hydration, match a saved closed-sidebar preference so the sidebar never flashes open. */
+@media (width >= 48rem) {
+  .sidebar-closed [data-sidebar-pane] {
+    display: none;
+  }
+
+  .sidebar-closed [data-topbar-nav] {
+    display: flex;
   }
 }
 

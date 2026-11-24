@@ -65,7 +65,10 @@ export const TopBar = memo(function TopBar(props: TopBarProps) {
           <SidebarToggle open={drawerOpen} solved={solvedCount} total={totalLessons} onClick={props.onToggleSidebar} />
         </div>
         <span className="hidden truncate px-1 text-sm font-medium sm:inline">{SITE_NAME}</span>
-        <div className={cn('flex min-w-0 items-center gap-1.5', sidebarOpen && 'md:hidden', drawerOpen && 'max-md:hidden')}>
+        <div
+          data-topbar-nav
+          className={cn('flex min-w-0 items-center gap-1.5', sidebarOpen && 'md:hidden', drawerOpen && 'max-md:hidden')}
+        >
           <div className="flex shrink-0 items-center">
             <LessonArrow lesson={props.previous} direction="previous" />
             <LessonArrow lesson={props.next} direction="next" />

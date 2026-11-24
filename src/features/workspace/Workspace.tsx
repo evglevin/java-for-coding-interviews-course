@@ -1,10 +1,10 @@
+import type React from 'react';
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { ClientOnly, useHydrated, useNavigate } from '@tanstack/react-router';
 import { BookOpen, Code2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LESSONS, SECTIONS, getSection } from '@/course';
 import type { Lesson } from '@/course/types';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Confetti } from '@/components/Confetti';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -33,6 +33,7 @@ import {
 } from '@/features/progress/progress';
 import { copyProgressLink, decodeProgress, takeProgressFromUrl, type IncomingProgress } from '@/features/progress/progressLink';
 import { javaRuntime, useRuntimeStatus } from '@/features/runner/runtime';
+import { startDrag } from './resize';
 import { TopBar } from './TopBar';
 
 // CodeMirror is the heaviest part of the page; it loads after the lesson text is interactive.
@@ -64,6 +65,9 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
   const [mobileView, setMobileView] = useState<MobileView>('lesson');
   const [editorRequested, setEditorRequested] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(268);
+  const [lessonWidthPct, setLessonWidthPct] = useState(44);
+  const contentSplitRef = useRef<HTMLDivElement | null>(null);
   const [editorExpanded, setEditorExpanded] = useState(false);
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [incoming, setIncoming] = useState<IncomingProgress | null>(null);
@@ -203,6 +207,24 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
     [incoming],
   );
 
+  const handleSidebarDrag = (event: React.PointerEvent) => {
+    const startX = event.clientX;
+    const startWidth = sidebarWidth;
+    startDrag(event, 'col-resize', (ev) => {
+      setSidebarWidth(Math.min(400, Math.max(210, startWidth + ev.clientX - startX)));
+    });
+  };
+
+  const handleHorizontalDrag = (event: React.PointerEvent) => {
+    const container = contentSplitRef.current;
+    if (!container) return;
+    startDrag(event, 'col-resize', (ev) => {
+      const rect = container.getBoundingClientRect();
+      const pct = ((ev.clientX - rect.left) / rect.width) * 100;
+      setLessonWidthPct(Math.min(68, Math.max(26, pct)));
+    });
+  };
+
   const sidebar = (
     <CurriculumSidebar
       currentLessonId={lesson.id}
@@ -263,34 +285,28 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
       />
 
       <MobilePaneSwitch view={mobileView} onChange={changeMobileView} />
-      <main className="flex min-h-0 flex-1 overflow-hidden p-1.5 md:p-2">
-        <ResizablePanelGroup orientation="horizontal" data-mobile-pane={mobileView} disabled={isMobile}>
-          {preferences.sidebarOpen && (
-            <>
-              <ResizablePanel
-                id="sidebar"
-                defaultSize={268}
-                minSize={210}
-                maxSize={400}
-                groupResizeBehavior="preserve-pixel-size"
-              >
-                {sidebar}
-              </ResizablePanel>
-              <PaneGutter />
-            </>
-          )}
+      <main className="flex min-h-0 flex-1 overflow-hidden p-1.5 md:p-2" data-mobile-pane={mobileView}>
+        {preferences.sidebarOpen && (
+          <>
+            <div id="sidebar" data-sidebar-pane className="h-full shrink-0" style={{ width: sidebarWidth }}>
+              {sidebar}
+            </div>
+            <PaneGutter data-sidebar-pane onPointerDown={handleSidebarDrag} title="Drag to resize sidebar" />
+          </>
+        )}
+        <div ref={contentSplitRef} className="flex h-full min-w-0 flex-1 overflow-hidden">
           {(!editorExpanded || isMobile) && (
             <>
-              <ResizablePanel id="lesson" defaultSize="44%" minSize="26%">
+              <div id="lesson" className="h-full min-w-0 shrink-0" style={{ width: `${lessonWidthPct}%` }}>
                 {lessonPane}
-              </ResizablePanel>
-              <PaneGutter />
+              </div>
+              <PaneGutter data-pane-gutter onPointerDown={handleHorizontalDrag} title="Drag to resize panes" />
             </>
           )}
-          <ResizablePanel id="code" minSize="30%">
-            <div className="flex h-full flex-col overflow-hidden rounded-lg border bg-card">{codePane}</div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+          <div id="code" className="flex h-full min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-card">
+            {codePane}
+          </div>
+        </div>
       </main>
       {isMobile && (
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
@@ -321,11 +337,23 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
 }
 
 /** A gap between panes that also works as the resize handle. */
-function PaneGutter() {
+function PaneGutter({
+  onPointerDown,
+  title,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'> & {
+  onPointerDown: (event: React.PointerEvent) => void;
+  title: string;
+}) {
   return (
-    <ResizableHandle className="group w-2.5 bg-transparent">
-      <div className="h-10 w-1 rounded-full bg-border-strong transition-colors group-hover:bg-brand group-data-[separator=active]:bg-brand" />
-    </ResizableHandle>
+    <div
+      onPointerDown={onPointerDown}
+      title={title}
+      className="group flex w-2.5 shrink-0 cursor-col-resize touch-none items-center justify-center"
+      {...props}
+    >
+      <div className="h-10 w-1 rounded-full bg-border-strong transition-colors group-hover:bg-brand" />
+    </div>
   );
 }
 

@@ -1,8 +1,8 @@
 /**
  * Per-browser UI preferences. Server-rendered HTML uses the defaults; the browser swaps
  * in saved values right after hydration (useSyncExternalStore's server snapshot), so
- * markup always matches during hydration. The theme is also applied before first paint
- * by THEME_BOOT_SCRIPT, so there is no flash.
+ * markup always matches during hydration. Theme and closed-sidebar state are also applied
+ * before first paint by PREFERENCES_BOOT_SCRIPT, so there is no flash.
  */
 
 import { useSyncExternalStore } from 'react';
@@ -66,6 +66,7 @@ export function setFontSize(fontSize: number) {
 }
 
 export function setSidebarOpen(sidebarOpen: boolean) {
+  document.documentElement.classList.toggle('sidebar-closed', !sidebarOpen);
   writeItem(STORAGE_KEYS.sidebarOpen, String(sidebarOpen));
   update({ sidebarOpen });
 }
@@ -85,7 +86,9 @@ export function markWelcomeSeen() {
   update({ welcomeSeen: true });
 }
 
-/** Inlined into <head>: applies the saved theme before the first paint. */
-export const THEME_BOOT_SCRIPT = `(function(){try{var t=localStorage.getItem(${JSON.stringify(
+/** Inlined into <head>: applies saved theme and sidebar state before the first paint. */
+export const PREFERENCES_BOOT_SCRIPT = `(function(){try{var c=document.documentElement.classList;c.toggle('dark',localStorage.getItem(${JSON.stringify(
   STORAGE_KEYS.theme,
-)});document.documentElement.classList.toggle('dark',t!=='light');}catch(e){}})();`;
+)})!=='light');c.toggle('sidebar-closed',localStorage.getItem(${JSON.stringify(
+  STORAGE_KEYS.sidebarOpen,
+)})==='false');}catch(e){}})();`;
