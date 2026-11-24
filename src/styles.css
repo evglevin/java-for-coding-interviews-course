@@ -100,7 +100,7 @@
   --secondary: #2c2c32;
   --secondary-foreground: #f4f4f5;
   --muted: #27272c;
-  --muted-foreground: #8b8b96;
+  --muted-foreground: #92929e;
   --accent: #2c2c32;
   --accent-foreground: #f4f4f5;
   --destructive: #f87171;
@@ -120,6 +120,19 @@
   --danger-soft: rgb(248 113 113 / 0.11);
   --inline-code: #2c2c34;
   --inline-code-foreground: #e4e4e7;
+}
+
+/* Use the same lesson markup at every viewport size, including before hydration. */
+@media (width < 48rem) {
+  [data-mobile-pane] > :is(#sidebar, [data-slot='resizable-handle']),
+  [data-mobile-pane='lesson'] > #code,
+  [data-mobile-pane='code'] > #lesson {
+    display: none !important;
+  }
+
+  [data-mobile-pane] > :is(#lesson, #code) {
+    flex: 1 1 0 !important;
+  }
 }
 
 @layer base {

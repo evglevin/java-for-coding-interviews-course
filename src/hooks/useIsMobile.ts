@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 
 /** Below Tailwind's `md` breakpoint the app shows one pane at a time. */
-const MOBILE_QUERY = '(max-width: 767px)';
+const MOBILE_QUERY = '(width < 48rem)';
 
 const mediaQuery = typeof window !== 'undefined' ? window.matchMedia(MOBILE_QUERY) : null;
 

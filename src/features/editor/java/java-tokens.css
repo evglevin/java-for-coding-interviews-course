@@ -6,12 +6,12 @@
 :root {
   --java-fg: #18181b;
   --java-keyword: #7c3aed;
-  --java-type: #0284c7;
+  --java-type: #0369a1;
   --java-function: #b45309;
   --java-annotation: #b45309;
   --java-constant: #1d4ed8;
   --java-variable: #1e293b;
-  --java-number: #059669;
+  --java-number: #047857;
   --java-string: #c2410c;
   --java-comment: #15803d;
   --java-atom: #2563eb;

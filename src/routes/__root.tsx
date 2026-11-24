@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 import { HeadContent, Link, Scripts, createRootRoute } from '@tanstack/react-router';
 import { Analytics } from '@vercel/analytics/react';
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { THEME_BOOT_SCRIPT } from '@/features/preferences/preferences';
 import { SITE_HEAD } from '@/features/seo/seo';
 import { FIRST_LESSON } from '@/course';
+import { SITE_URL } from '@/site';
 import appCss from '../styles.css?url';
 
 /**
@@ -22,7 +24,11 @@ export const Route = createRootRoute({
       { name: 'theme-color', content: '#f3f4f6', media: '(prefers-color-scheme: light)' },
       ...SITE_HEAD.meta,
     ],
-    links: [{ rel: 'stylesheet', href: appCss }, ...SITE_HEAD.links],
+    links: [
+      { rel: 'preload', href: geistLatin, as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      { rel: 'stylesheet', href: appCss },
+      ...SITE_HEAD.links,
+    ],
   }),
   shellComponent: RootDocument,
   notFoundComponent: NotFound,
@@ -38,12 +44,17 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body>
         <TooltipProvider delayDuration={400}>{children}</TooltipProvider>
-        {/* Vercel Web Analytics: no cookies; only sends on the deployed site, not in dev. */}
-        <Analytics />
+        <SiteAnalytics />
         <Scripts />
       </body>
     </html>
   );
+}
+
+function SiteAnalytics() {
+  if (!import.meta.env.PROD || typeof window === 'undefined') return null;
+  const { hostname, origin } = window.location;
+  return origin === SITE_URL || hostname.endsWith('.vercel.app') ? <Analytics /> : null;
 }
 
 function NotFound() {

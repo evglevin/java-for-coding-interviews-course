@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
-import { ClientOnly, useNavigate } from '@tanstack/react-router';
+import { ClientOnly, useHydrated, useNavigate } from '@tanstack/react-router';
 import { BookOpen, Code2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LESSONS, SECTIONS, getSection } from '@/course';
@@ -29,7 +29,6 @@ import {
   loadProgress,
   markSolved,
   replaceProgress,
-  saveActiveLessonId,
   useSolvedIds,
 } from '@/features/progress/progress';
 import { copyProgressLink, decodeProgress, takeProgressFromUrl, type IncomingProgress } from '@/features/progress/progressLink';
@@ -50,6 +49,7 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
   const preferences = usePreferences();
   const solvedIds = useSolvedIds();
   const isMobile = useIsMobile();
+  const hydrated = useHydrated();
   const runtimeStatus = useRuntimeStatus();
   const running = runtimeStatus.state === 'running';
 
@@ -62,6 +62,7 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
   const [result, setResult] = useState<RunResult | null>(null);
   const [diagnostics, setDiagnostics] = useState<Diagnostics>(null);
   const [mobileView, setMobileView] = useState<MobileView>('lesson');
+  const [editorRequested, setEditorRequested] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editorExpanded, setEditorExpanded] = useState(false);
   const [consoleOpen, setConsoleOpen] = useState(false);
@@ -81,12 +82,16 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
   latestTabs.current = tabs;
 
   useEffect(() => {
-    saveActiveLessonId(lesson.id);
     setSectionCollapsed(lesson.sectionId, false);
   }, [lesson.id, lesson.sectionId]);
 
-  // Load the compiler on the first interaction, so the first paint stays light.
   useEffect(() => {
+    if (hydrated && !isMobile) setEditorRequested(true);
+  }, [hydrated, isMobile]);
+
+  // Desktop has the editor alongside the lesson, so warm up after the first interaction.
+  useEffect(() => {
+    if (!hydrated || isMobile) return;
     const warmup = () => javaRuntime.warmup();
     window.addEventListener('pointerdown', warmup, { once: true, passive: true });
     window.addEventListener('keydown', warmup, { once: true, passive: true });
@@ -94,7 +99,7 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
       window.removeEventListener('pointerdown', warmup);
       window.removeEventListener('keydown', warmup);
     };
-  }, []);
+  }, [hydrated, isMobile]);
 
   // Progress links carry the progress in the URL fragment; pasting one for the open lesson only fires hashchange.
   useEffect(() => {
@@ -134,13 +139,30 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
   const run = useCallback(() => void execute('run'), [execute]);
   const submit = useCallback(() => void execute('submit'), [execute]);
 
-  const loadCode = useCallback((code: string) => editor.current?.replaceCode(code), []);
+  const changeCode = tabs.change;
+  const loadCode = useCallback(
+    (code: string) => {
+      if (editor.current) editor.current.replaceCode(code);
+      else changeCode(code);
+    },
+    [changeCode],
+  );
+  const changeMobileView = useCallback(
+    (view: MobileView) => {
+      if (view === 'code') {
+        setEditorRequested(true);
+        if (isMobile) javaRuntime.warmup();
+      }
+      setMobileView(view);
+    },
+    [isMobile],
+  );
   const loadSolution = useCallback(
     (code: string) => {
       loadCode(code);
-      setMobileView('code');
+      changeMobileView('code');
     },
-    [loadCode],
+    [changeMobileView, loadCode],
   );
 
   const goToNext = useCallback(() => {
@@ -190,7 +212,6 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
       onSelectLesson={isMobile ? () => (setDrawerOpen(false), setMobileView('lesson')) : undefined}
       onResetProgress={resetProgress}
       onSaveProgressLink={saveProgressLink}
-      className={isMobile ? 'w-full' : undefined}
     />
   );
 
@@ -198,31 +219,31 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
     <LessonPane key={lesson.id} lesson={lesson} isSolved={solvedIds.has(lesson.id)} onLoadSolution={loadSolution} />
   );
 
-  const codePane = (
-    <ClientOnly fallback={<CodePaneFallback />}>
-      <Suspense fallback={<CodePaneFallback />}>
-        <CodePane
-          tabs={tabs}
-          editor={editor}
-          diagnostics={diagnostics}
-          result={result}
-          running={running}
-          runtimeStatus={runtimeStatus}
-          theme={preferences.theme}
-          fontSize={preferences.fontSize}
-          consoleOpen={consoleOpen}
-          onConsoleOpenChange={setConsoleOpen}
-          expanded={editorExpanded}
-          canExpand={!isMobile}
-          hasNextLesson={next !== null}
-          onToggleExpand={() => setEditorExpanded((e) => !e)}
-          onReset={() => loadCode(lesson.starterCode)}
-          onRun={run}
-          onSubmit={submit}
-          onNextLesson={goToNext}
-        />
-      </Suspense>
-    </ClientOnly>
+  const codePane = editorRequested ? (
+    <Suspense fallback={<CodePaneFallback />}>
+      <CodePane
+        tabs={tabs}
+        editor={editor}
+        diagnostics={diagnostics}
+        result={result}
+        running={running}
+        runtimeStatus={runtimeStatus}
+        theme={preferences.theme}
+        fontSize={preferences.fontSize}
+        consoleOpen={consoleOpen}
+        onConsoleOpenChange={setConsoleOpen}
+        expanded={editorExpanded}
+        canExpand={!isMobile}
+        hasNextLesson={next !== null}
+        onToggleExpand={() => setEditorExpanded((e) => !e)}
+        onReset={() => loadCode(lesson.starterCode)}
+        onRun={run}
+        onSubmit={submit}
+        onNextLesson={goToNext}
+      />
+    </Suspense>
+  ) : (
+    <CodePaneFallback />
   );
 
   return (
@@ -234,68 +255,55 @@ export function Workspace({ lesson }: { lesson: Lesson }) {
         next={next}
         solvedCount={LESSONS.filter((l) => solvedIds.has(l.id)).length}
         totalLessons={LESSONS.length}
-        sidebarOpen={isMobile ? drawerOpen : preferences.sidebarOpen}
+        sidebarOpen={preferences.sidebarOpen}
+        drawerOpen={drawerOpen}
         theme={preferences.theme}
         onToggleSidebar={toggleSidebar}
         onToggleTheme={() => setTheme(preferences.theme === 'dark' ? 'light' : 'dark')}
       />
 
-      {isMobile ? (
-        <>
-          <MobilePaneSwitch view={mobileView} onChange={setMobileView} />
-          <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-1.5">
-            {mobileView === 'lesson' && lessonPane}
-            {/* Hidden rather than unmounted, so the editor keeps its state. */}
-            <div
-              className={cn(
-                'min-h-0 flex-1 flex-col overflow-hidden rounded-lg border bg-card',
-                mobileView === 'code' ? 'flex' : 'hidden',
-              )}
-            >
-              {codePane}
-            </div>
-          </main>
-          <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <SheetContent
-              side="left"
-              className="w-[min(320px,calc(100vw-48px))] gap-0 border-none bg-transparent p-1.5"
-              showCloseButton={false}
-            >
-              <SheetTitle className="sr-only">Lessons</SheetTitle>
-              {sidebar}
-            </SheetContent>
-          </Sheet>
-        </>
-      ) : (
-        <main className="flex min-h-0 flex-1 overflow-hidden p-2">
-          <ResizablePanelGroup orientation="horizontal">
-            {preferences.sidebarOpen && (
-              <>
-                <ResizablePanel
-                  id="sidebar"
-                  defaultSize={268}
-                  minSize={210}
-                  maxSize={400}
-                  groupResizeBehavior="preserve-pixel-size"
-                >
-                  {sidebar}
-                </ResizablePanel>
-                <PaneGutter />
-              </>
-            )}
-            {!editorExpanded && (
-              <>
-                <ResizablePanel id="lesson" defaultSize="44" minSize="26">
-                  {lessonPane}
-                </ResizablePanel>
-                <PaneGutter />
-              </>
-            )}
-            <ResizablePanel id="code" minSize="30">
-              <div className="flex h-full flex-col overflow-hidden rounded-lg border bg-card">{codePane}</div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </main>
+      <MobilePaneSwitch view={mobileView} onChange={changeMobileView} />
+      <main className="flex min-h-0 flex-1 overflow-hidden p-1.5 md:p-2">
+        <ResizablePanelGroup orientation="horizontal" data-mobile-pane={mobileView} disabled={isMobile}>
+          {preferences.sidebarOpen && (
+            <>
+              <ResizablePanel
+                id="sidebar"
+                defaultSize={268}
+                minSize={210}
+                maxSize={400}
+                groupResizeBehavior="preserve-pixel-size"
+              >
+                {sidebar}
+              </ResizablePanel>
+              <PaneGutter />
+            </>
+          )}
+          {(!editorExpanded || isMobile) && (
+            <>
+              <ResizablePanel id="lesson" defaultSize="44%" minSize="26%">
+                {lessonPane}
+              </ResizablePanel>
+              <PaneGutter />
+            </>
+          )}
+          <ResizablePanel id="code" minSize="30%">
+            <div className="flex h-full flex-col overflow-hidden rounded-lg border bg-card">{codePane}</div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </main>
+      {isMobile && (
+        <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <SheetContent
+            side="left"
+            className="w-[min(320px,calc(100vw-48px))] gap-0 border-none bg-transparent p-1.5"
+            showCloseButton={false}
+            aria-describedby={undefined}
+          >
+            <SheetTitle className="sr-only">Lessons</SheetTitle>
+            {sidebar}
+          </SheetContent>
+        </Sheet>
       )}
 
       <Confetti trigger={confettiRun} />
@@ -327,14 +335,14 @@ function MobilePaneSwitch({ view, onChange }: { view: MobileView; onChange: (vie
     { id: 'code', label: 'Code', Icon: Code2 },
   ] as const;
   return (
-    <div className="shrink-0 px-1.5 pt-1.5">
-      <div role="tablist" aria-label="Pane" className="grid grid-cols-2 gap-1 rounded-lg border bg-card p-1">
+    <div className="shrink-0 px-1.5 pt-1.5 md:hidden">
+      <div role="group" aria-label="Pane" className="grid grid-cols-2 gap-1 rounded-lg border bg-card p-1">
         {options.map(({ id, label, Icon }) => (
           <button
             key={id}
             type="button"
-            role="tab"
-            aria-selected={view === id}
+            aria-controls={id}
+            aria-pressed={view === id}
             onClick={() => onChange(id)}
             className={cn(
               'flex items-center justify-center gap-1.5 rounded-md py-1.5 text-[13px] font-medium transition-colors',

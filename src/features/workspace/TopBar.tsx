@@ -6,6 +6,7 @@ import { GithubIcon } from '@/components/GithubIcon';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Lesson, Section } from '@/course/types';
 import type { Theme } from '@/features/preferences/preferences';
+import { cn } from '@/lib/utils';
 import { REPO_URL, SITE_NAME } from '@/site';
 
 interface TopBarProps {
@@ -16,6 +17,7 @@ interface TopBarProps {
   solvedCount: number;
   totalLessons: number;
   sidebarOpen: boolean;
+  drawerOpen: boolean;
   theme: Theme;
   onToggleSidebar(): void;
   onToggleTheme(): void;
@@ -52,26 +54,29 @@ function LessonArrow({ lesson, direction }: { lesson: Lesson | null; direction: 
 }
 
 export const TopBar = memo(function TopBar(props: TopBarProps) {
-  const { lesson, section, sidebarOpen, theme, solvedCount, totalLessons } = props;
+  const { lesson, section, sidebarOpen, drawerOpen, theme, solvedCount, totalLessons } = props;
   return (
     <header className="flex h-11 shrink-0 items-center justify-between gap-2 border-b bg-topbar px-2 select-none md:px-3">
       <div className="flex min-w-0 items-center gap-1.5">
-        <SidebarToggle open={sidebarOpen} solved={solvedCount} total={totalLessons} onClick={props.onToggleSidebar} />
+        <div className="hidden md:flex">
+          <SidebarToggle open={sidebarOpen} solved={solvedCount} total={totalLessons} onClick={props.onToggleSidebar} />
+        </div>
+        <div className="flex md:hidden">
+          <SidebarToggle open={drawerOpen} solved={solvedCount} total={totalLessons} onClick={props.onToggleSidebar} />
+        </div>
         <span className="hidden truncate px-1 text-sm font-medium sm:inline">{SITE_NAME}</span>
-        {!sidebarOpen && (
-          <>
-            <div className="flex shrink-0 items-center">
-              <LessonArrow lesson={props.previous} direction="previous" />
-              <LessonArrow lesson={props.next} direction="next" />
-            </div>
-            <div className="ml-1 flex min-w-0 items-center gap-1.5 text-xs">
-              <span className="truncate font-medium text-prose">{section.title}</span>
-              <span className="shrink-0 text-muted-foreground">
-                ({lesson.positionInSection} / {section.lessonIds.length})
-              </span>
-            </div>
-          </>
-        )}
+        <div className={cn('flex min-w-0 items-center gap-1.5', sidebarOpen && 'md:hidden', drawerOpen && 'max-md:hidden')}>
+          <div className="flex shrink-0 items-center">
+            <LessonArrow lesson={props.previous} direction="previous" />
+            <LessonArrow lesson={props.next} direction="next" />
+          </div>
+          <div className="ml-1 flex min-w-0 items-center gap-1.5 text-xs">
+            <span className="truncate font-medium text-prose">{section.title}</span>
+            <span className="shrink-0 text-muted-foreground">
+              ({lesson.positionInSection} / {section.lessonIds.length})
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">

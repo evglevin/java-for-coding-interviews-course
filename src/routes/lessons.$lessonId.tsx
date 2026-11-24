@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { findLesson } from '@/course';
+import { saveActiveLessonId } from '@/features/progress/progress';
 import { lessonHead } from '@/features/seo/seo';
 import { Workspace } from '@/features/workspace/Workspace';
 
@@ -15,5 +17,6 @@ export const Route = createFileRoute('/lessons/$lessonId')({
 
 function LessonPage() {
   const { lessonId } = Route.useLoaderData();
+  useEffect(() => saveActiveLessonId(lessonId), [lessonId]);
   return <Workspace lesson={findLesson(lessonId)!} />;
 }

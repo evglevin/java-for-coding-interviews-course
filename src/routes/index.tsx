@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-router';
 import { FIRST_LESSON, findLesson } from '@/course';
 import { loadActiveLessonId } from '@/features/progress/progress';
 import { homeHead } from '@/features/seo/seo';
@@ -12,18 +12,19 @@ export const Route = createFileRoute('/')({
 
 /**
  * The home page is prerendered as the first lesson (with the course's own metadata);
- * in the browser it moves on to the lesson the learner last had open.
+ * returning learners can resume a different lesson they last had open.
  */
 function Home() {
   const navigate = useNavigate();
+  const hash = useLocation({ select: (location) => location.hash });
   useEffect(() => {
-    const lesson = findLesson(loadActiveLessonId() ?? '') ?? FIRST_LESSON;
+    const lesson = findLesson(loadActiveLessonId() ?? '');
+    if (hash || !lesson || lesson.id === FIRST_LESSON.id) return;
     void navigate({
       to: '/lessons/$lessonId',
       params: { lessonId: lesson.id },
       replace: true,
-      hash: window.location.hash.slice(1) || undefined,
     });
-  }, [navigate]);
+  }, [hash, navigate]);
   return <Workspace lesson={FIRST_LESSON} />;
 }

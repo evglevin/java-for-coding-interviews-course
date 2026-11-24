@@ -111,9 +111,9 @@ function Block({ block }: { block: ContentBlock }) {
       );
     case 'heading':
       return (
-        <h3 className="pt-2 text-base font-bold text-foreground">
+        <h2 className="pt-2 text-base font-bold text-foreground">
           <Markup text={block.text} />
-        </h3>
+        </h2>
       );
     case 'code':
       return <JavaCodeBlock code={block.code} caption={block.caption} />;

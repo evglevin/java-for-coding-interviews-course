@@ -84,7 +84,7 @@ export function editorTheme(theme: Theme, fontSize: number): Extension {
       },
       '.cm-gutters': {
         backgroundColor: isDark ? '#1e1e22' : '#fafafa',
-        color: isDark ? '#63636e' : '#9ca3af',
+        color: isDark ? '#92929e' : '#6b7280',
         borderRight: isDark ? '1px solid #2a2a30' : '1px solid #e5e7eb',
         paddingRight: '4px',
       },

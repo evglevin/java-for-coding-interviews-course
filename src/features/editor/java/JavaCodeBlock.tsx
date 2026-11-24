@@ -11,7 +11,7 @@ interface JavaCodeBlockProps {
 }
 
 const HEADER_BUTTON =
-  'flex cursor-pointer items-center gap-1 rounded px-2 py-0.5 text-xs font-medium transition-colors hover:bg-accent hover:text-foreground';
+  'flex min-h-6 cursor-pointer items-center gap-1 rounded px-2 text-xs font-medium transition-colors hover:bg-accent hover:text-foreground';
 
 /** A read-only, highlighted Java snippet. Renders its content during prerendering. */
 export function JavaCodeBlock({ code, caption, onLoadIntoEditor }: JavaCodeBlockProps) {
