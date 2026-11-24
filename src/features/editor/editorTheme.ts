@@ -74,7 +74,7 @@ function searchPanelStyles(isDark: boolean) {
     // Both rows share one grid, so the Find and Replace fields always line up at the same width.
     '.cm-panel.cm-search': {
       display: 'grid',
-      gridTemplateColumns: 'minmax(0, 300px) minmax(max-content, 1fr)',
+      gridTemplateColumns: 'auto minmax(0, 300px) minmax(max-content, 1fr)',
       columnGap: '8px',
       rowGap: '6px',
       padding: '8px 10px',
@@ -84,13 +84,28 @@ function searchPanelStyles(isDark: boolean) {
     '.cm-search-row': {
       display: 'contents',
     },
+    '.cm-search-row[hidden]': {
+      display: 'none',
+    },
+    '.cm-search-expand': {
+      gridColumn: '1',
+      gridRow: '1',
+    },
+    '.cm-search-expand svg': {
+      transition: 'transform 150ms',
+    },
+    '.cm-search-expand[aria-expanded=true] svg': {
+      transform: 'rotate(90deg)',
+    },
     '.cm-search-field': {
+      gridColumn: '2',
       position: 'relative',
       display: 'flex',
       alignItems: 'center',
       minWidth: '0',
     },
     '.cm-search-actions': {
+      gridColumn: '3',
       display: 'flex',
       alignItems: 'center',
       gap: '2px',
@@ -166,8 +181,7 @@ function searchPanelStyles(isDark: boolean) {
       boxShadow: '0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent)',
     },
     '.cm-search-count': {
-      minWidth: '72px',
-      marginRight: '4px',
+      marginLeft: '6px',
       color: 'var(--muted-foreground)',
       fontSize: '12px',
       fontVariantNumeric: 'tabular-nums',

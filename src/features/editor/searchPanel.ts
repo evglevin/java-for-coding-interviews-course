@@ -31,6 +31,7 @@ const ICONS = {
   replaceAll:
     '<path d="M14 14a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1"/><path d="M14 4a1 1 0 0 1 1-1"/><path d="M15 10a1 1 0 0 1-1-1"/><path d="M19 14a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1"/><path d="M21 4a1 1 0 0 0-1-1"/><path d="M21 9a1 1 0 0 1-1 1"/><path d="m3 7 3 3 3-3"/><path d="M6 10V5a2 2 0 0 1 2-2h2"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
   close: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  chevronRight: '<path d="m9 18 6-6-6-6"/>',
 } as const;
 
 /** Counting stops here so a one-character query in a huge document stays cheap. */
@@ -78,6 +79,8 @@ class SearchPanel implements Panel {
   private replaceField: HTMLInputElement;
   private toggles: { caseSensitive: HTMLButtonElement; wholeWord: HTMLButtonElement; regexp: HTMLButtonElement };
   private count: HTMLElement;
+  private replaceRow: HTMLElement | null = null;
+  private expandButton: HTMLButtonElement | null = null;
   private view: EditorView;
 
   constructor(view: EditorView) {
@@ -130,29 +133,36 @@ class SearchPanel implements Panel {
         el('div', { class: 'cm-search-toggles' }, [this.toggles.caseSensitive, this.toggles.wholeWord, this.toggles.regexp]),
       ]),
       el('div', { class: 'cm-search-actions' }, [
-        this.count,
         iconButton('Previous match (Shift+Enter)', 'arrowUp', 'cm-search-button', () => findPrevious(view)),
         iconButton('Next match (Enter)', 'arrowDown', 'cm-search-button', () => findNext(view)),
         iconButton('Select all matches', 'selectAll', 'cm-search-button', () => selectMatches(view)),
+        this.count,
         iconButton('Close (Escape)', 'close', 'cm-search-button cm-search-close', () => closeSearchPanel(view)),
       ]),
     ]);
 
-    const rows: HTMLElement[] = [findRow];
+    const children: HTMLElement[] = [findRow];
     if (!view.state.readOnly) {
-      rows.push(
-        el('div', { class: 'cm-search-row' }, [
-          el('div', { class: 'cm-search-field' }, [this.replaceField]),
-          el('div', { class: 'cm-search-actions' }, [
-            iconButton('Replace (Enter)', 'replace', 'cm-search-button', () => replaceNext(view)),
-            iconButton('Replace all', 'replaceAll', 'cm-search-button', () => replaceAll(view)),
-          ]),
+      // Replace stays collapsed behind a chevron until asked for, like VS Code.
+      this.expandButton = iconButton('Toggle replace', 'chevronRight', 'cm-search-button cm-search-expand', () => {
+        const visible = this.expandButton?.getAttribute('aria-expanded') !== 'true';
+        this.setReplaceVisible(visible);
+        (visible ? this.replaceField : this.searchField).focus();
+      });
+      this.replaceRow = el('div', { class: 'cm-search-row' }, [
+        el('div', { class: 'cm-search-field' }, [this.replaceField]),
+        el('div', { class: 'cm-search-actions' }, [
+          iconButton('Replace (Enter)', 'replace', 'cm-search-button', () => replaceNext(view)),
+          iconButton('Replace all', 'replaceAll', 'cm-search-button', () => replaceAll(view)),
         ]),
-      );
+      ]);
+      children.unshift(this.expandButton);
+      children.push(this.replaceRow);
     }
 
-    this.dom = el('div', { class: 'cm-search', role: 'search' }, rows);
+    this.dom = el('div', { class: 'cm-search', role: 'search' }, children);
     this.dom.addEventListener('keydown', (event) => this.keydown(event));
+    this.setReplaceVisible(this.query.replace !== '');
     this.syncToggles();
     this.updateCount();
   }
@@ -172,6 +182,12 @@ class SearchPanel implements Panel {
       }
     }
     if (queryChanged || update.docChanged || update.selectionSet) this.updateCount();
+  }
+
+  private setReplaceVisible(visible: boolean) {
+    if (!this.replaceRow || !this.expandButton) return;
+    this.replaceRow.hidden = !visible;
+    this.expandButton.setAttribute('aria-expanded', String(visible));
   }
 
   private commit() {
